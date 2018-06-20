@@ -110,6 +110,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ApiClient.cs" />
+    <Compile Include="Packer.cs" />
     <Compile Include="QpdfAdapter.cs" />
     <Compile Include="Strings1.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -163,6 +164,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <None Include="Resources\template.pdf" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config">

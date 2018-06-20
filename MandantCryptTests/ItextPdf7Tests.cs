@@ -26,6 +26,21 @@ namespace MandantCrypt.Tests
             this.pdfRessources = testRessources + Path.DirectorySeparatorChar + "pdf" + Path.DirectorySeparatorChar;
         }
 
+        [TestMethod()]
+        public void PackerTestiText7()
+        {
+            var method = System.Reflection.MethodBase.GetCurrentMethod().Name;
+            string targetFile= Path.Combine(testRessources, string.Concat(DateTime.Now.ToString("yyyyMMdd"), "_" + method + "_packered.pdf"));
+            string[] filesInSrcFolder = Directory.GetFiles(Path.Combine(this.testRessources,"tozip"));
+            string password = "password";
+
+            Packer myPacker = new Packer();
+            myPacker.setPackerType(Packer.PackerType.ITEXT7);
+            myPacker.setDstFilename(targetFile);
+            myPacker.addFilesToList(filesInSrcFolder);
+            myPacker.pack(password);
+            Assert.IsTrue(File.Exists(targetFile),"Target file does not exist");
+        }
 
         [TestMethod()]
         public void CompressedPdfiText()

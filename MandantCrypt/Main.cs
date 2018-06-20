@@ -270,5 +270,10 @@ namespace MandantCrypt
         {
             log.Info("Closing app");
         }
+
+        private void listView1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
     }
 }
