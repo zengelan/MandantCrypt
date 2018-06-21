@@ -1,5 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Net;
 
 namespace MandantCrypt.Tests
@@ -7,23 +9,40 @@ namespace MandantCrypt.Tests
     [TestClass()]
     public class ApiClientTests
     {
+        int stdPort = 8080;
+
         [TestMethod()]
         public void ApiClientTest()
         {
-            ApiClient server = new ApiClient("http://localhost:8000");
-            Assert.AreEqual(server.serviceUrl, "http://localhost:8000/api/v1/");
+            ApiClient server = new ApiClient("http://localhost:" + stdPort);
+            Assert.AreEqual(server.serviceUrl, "http://localhost:"+ stdPort + "/api/v1/");
         }
 
         [TestMethod()]
         public void getActiveMandantListTest()
         {
-            TestWebServer ws = new TestWebServer(SendMandantList, "http://localhost:8080/api/v1/");
+            int myPort = stdPort;
+            TestWebServer ws = new TestWebServer(SendMandantList, "http://localhost:"+ myPort + "/api/v1/");
             ws.Run();
-            System.Threading.Thread.Sleep(20000);
-            ApiClient server = new ApiClient("http://localhost:8080");
+            System.Threading.Thread.Sleep(500);
+            ApiClient server = new ApiClient("http://localhost:"+ myPort);
             List<Mandant> mlist = server.getActiveMandantList();
             Assert.IsNotNull(mlist);
             Assert.IsTrue(mlist.Count > 1);
+            ws.Stop();
+        }
+
+        [TestMethod()]
+        public void getPasswordListTest()
+        {
+            int myPort = stdPort + 1;
+            TestWebServer ws = new TestWebServer(SendPassword, "http://localhost:" + myPort + "/api/v1/");
+            ws.Run();
+            System.Threading.Thread.Sleep(500);
+            ApiClient server = new ApiClient("http://localhost:" + myPort);
+            string password = server.getDecryptedPassword(1234567);
+            Assert.IsNotNull(password,"returned decrypted password was null");
+            Assert.AreEqual("secret+2018-06-14 02:14:03.654015+somesalt", password, "Password is different to what i would expect");
             ws.Stop();
         }
 
@@ -36,10 +55,29 @@ namespace MandantCrypt.Tests
             return myResp;
         }
 
-        public string SendPasswordList(HttpListenerRequest reqeust)
+        public TestResponse SendPassword(HttpListenerRequest request)
         {
-            string resp = "[{\"id\":18,\"name\":\"\",\"create_date\":\"2018-06-14T02:14:03.657011\",\"password\":\"secret+2018-06-14 02:14:03.654015+somesalt\",\"created_by\":\"<UNKNOWN>\"},{\"id\":17,\"name\":\"\",\"create_date\":\"2018-06-14T02:14:00.541601\",\"password\":\"secret+2018-06-14 02:14:00.538626+somesalt\",\"created_by\":\"<UNKNOWN>\"},{\"id\":16,\"name\":\"\",\"create_date\":\"2018-06-14T02:13:57.313670\",\"password\":\"secret+2018-06-14 02:13:57.311173+somesalt\",\"created_by\":\"<UNKNOWN>\"},{\"id\":15,\"name\":\"\",\"create_date\":\"2018-06-14T02:13:56.744582\",\"password\":\"secret+2018-06-14 02:13:56.741089+somesalt\",\"created_by\":\"<UNKNOWN>\"},{\"id\":14,\"name\":\"\",\"create_date\":\"2018-06-14T02:13:55.989790\",\"password\":\"secret+2018-06-14 02:13:55.986795+somesalt\",\"created_by\":\"<UNKNOWN>\"},{\"id\":13,\"name\":\"\",\"create_date\":\"2018-06-14T02:13:51.180367\",\"password\":\"secret+2018-06-14 02:13:51.178867+somesalt\",\"created_by\":\"<UNKNOWN>\"},{\"id\":12,\"name\":\"\",\"create_date\":\"2018-06-14T02:06:55.854370\",\"password\":\"secret+2018-06-14 02:06:55.849379+somesalt\",\"created_by\":\"<UNKNOWN>\"},{\"id\":11,\"name\":\"\",\"create_date\":\"2018-06-14T02:06:54.820843\",\"password\":\"secret+2018-06-14 02:06:54.817832+somesalt\",\"created_by\":\"<UNKNOWN>\"},{\"id\":10,\"name\":\"\",\"create_date\":\"2018-06-14T02:06:53.881190\",\"password\":\"secret+2018-06-14 02:06:53.879694+somesalt\",\"created_by\":\"<UNKNOWN>\"},{\"id\":9,\"name\":\"\",\"create_date\":\"2018-06-14T02:06:52.377559\",\"password\":\"secret+2018-06-14 02:06:52.376050+somesalt\",\"created_by\":\"<UNKNOWN>\"},{\"id\":8,\"name\":\"\",\"create_date\":\"2018-06-14T02:06:51.355764\",\"password\":\"secret+2018-06-14 02:06:51.353270+somesalt\",\"created_by\":\"<UNKNOWN>\"},{\"id\":7,\"name\":\"\",\"create_date\":\"2018-06-14T02:06:47.838451\",\"password\":\"secret+2018-06-14 02:06:47.835936+somesalt\",\"created_by\":\"<UNKNOWN>\"},{\"id\":6,\"name\":\"\",\"create_date\":\"2018-06-14T02:06:47.022977\",\"password\":\"secret+2018-06-14 02:06:47.020980+somesalt\",\"created_by\":\"<UNKNOWN>\"}]";
-            return resp;
+            Assert.AreEqual(request.HttpMethod, "GET", "This was not a GET request");
+            string url = request.Url.ToString();
+            NameValueCollection qs = request.QueryString;
+            Assert.IsTrue(qs.HasKeys(),"no query parameters in request");
+            Assert.IsTrue(request.QueryString.Get("mandant_id").Length == 7, "mandant_id not in query string");
+            Assert.IsTrue(request.QueryString.Get("mandant_id").Equals("1234567"), "mandant_id not 1234567");
+            TestResponse myResp = new TestResponse();
+            myResp.addHeader("Content-Type", "application/json");
+
+            //create password entry
+            Password pwd = new Password();
+            pwd.password = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
+            pwd.id = 23;
+            pwd.name = "Noname";
+            pwd.password_decrypted = "secret+2018-06-14 02:14:03.654015+somesalt";
+            pwd.created_by = "Hans Dampf";
+            pwd.create_date = DateTime.Parse("2018-06-14T02:14:03.657011");
+
+            //send this password entry back
+            myResp.content = pwd.ToJsonString();
+            return myResp;
         }
     }
 }

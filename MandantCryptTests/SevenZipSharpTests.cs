@@ -12,13 +12,16 @@ namespace MandantCrypt.Tests
     {
         string testRessources;
         string currentDir;
+        string outDir;
 
 
         [TestInitialize()]
         public void Initialize()
         {
             this.currentDir = Directory.GetCurrentDirectory();
-            this.testRessources = Path.GetFullPath(currentDir + Path.DirectorySeparatorChar + ".." + Path.DirectorySeparatorChar + ".." + Path.DirectorySeparatorChar + "testressources");
+            this.testRessources = Path.GetFullPath(currentDir + Path.DirectorySeparatorChar + ".." + Path.DirectorySeparatorChar + ".." + Path.DirectorySeparatorChar + "Resources");
+            this.outDir = Path.GetFullPath(currentDir + "testout");
+            Directory.CreateDirectory(outDir);
             SevenZipBase.SetLibraryPath(getLibraryPathFromDirectory(getArchitecture()));
         }
 
@@ -59,7 +62,7 @@ namespace MandantCrypt.Tests
         public void PackerTestSevenZip7Zip()
         {
             var method = System.Reflection.MethodBase.GetCurrentMethod().Name;
-            string targetFile = Path.Combine(testRessources, string.Concat(DateTime.Now.ToString("yyyyMMdd"), "_" + method + "_encrypted.7z"));
+            string targetFile = Path.Combine(outDir, string.Concat(DateTime.Now.ToString("yyyyMMdd"), "_" + method + "_encrypted.7z"));
             string[] filesInSrcFolder = Directory.GetFiles(Path.Combine(this.testRessources, "tozip"));
             string password = "password";
 
@@ -75,7 +78,7 @@ namespace MandantCrypt.Tests
         public void PackerTestSevenZipZip()
         {
             var method = System.Reflection.MethodBase.GetCurrentMethod().Name;
-            string targetFile = Path.Combine(testRessources, string.Concat(DateTime.Now.ToString("yyyyMMdd"), "_" + method + "_encrypted.zip"));
+            string targetFile = Path.Combine(outDir, string.Concat(DateTime.Now.ToString("yyyyMMdd"), "_" + method + "_encrypted.zip"));
             string[] filesInSrcFolder = Directory.GetFiles(Path.Combine(this.testRessources, "tozip"));
             string password = "password";
 
@@ -91,7 +94,7 @@ namespace MandantCrypt.Tests
         public void DirCompress()
         {
             // Set source and target folders
-            string targetFolder = testRessources;
+            string targetFolder = outDir;
             string srcFolder = testRessources + Path.DirectorySeparatorChar + "tozip" + Path.DirectorySeparatorChar;
             var method = System.Reflection.MethodBase.GetCurrentMethod().Name;
             string targetFile = Path.Combine(targetFolder, string.Concat(DateTime.Now.ToString("yyyyMMdd"), "_" + method + ".7z"));
@@ -116,7 +119,7 @@ namespace MandantCrypt.Tests
         public void FilesCompress()
         {
             // Set source and target folders
-            string targetFolder = testRessources;
+            string targetFolder = outDir;
             string srcFolder = testRessources + Path.DirectorySeparatorChar + "tozip" + Path.DirectorySeparatorChar;
             var method = System.Reflection.MethodBase.GetCurrentMethod().Name;
             string targetFile = Path.Combine(targetFolder, string.Concat(DateTime.Now.ToString("yyyyMMdd"), "_"+ method + ".7z"));
@@ -137,7 +140,7 @@ namespace MandantCrypt.Tests
         {
             string password = "password";
             // Set source and target folders
-            string targetFolder = testRessources;
+            string targetFolder = outDir;
             string srcFolder = testRessources + Path.DirectorySeparatorChar + "tozip" + Path.DirectorySeparatorChar;
             var method = System.Reflection.MethodBase.GetCurrentMethod().Name;
             string targetFile = Path.Combine(targetFolder, string.Concat(DateTime.Now.ToString("yyyyMMdd"), "_" + method + ".zip"));

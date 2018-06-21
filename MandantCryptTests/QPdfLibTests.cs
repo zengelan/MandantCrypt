@@ -13,6 +13,7 @@ namespace MandantCrypt.Tests
         string testRessources;
         string pdfRessources;
         string currentDir;
+        string outDir;
         QpdfAdapter qpdf;
 
 
@@ -20,8 +21,10 @@ namespace MandantCrypt.Tests
         public void Initialize()
         {
             this.currentDir = Directory.GetCurrentDirectory();
-            this.testRessources = Path.GetFullPath(currentDir + Path.DirectorySeparatorChar + ".." + Path.DirectorySeparatorChar + ".." + Path.DirectorySeparatorChar + "testressources");
+            this.testRessources = Path.GetFullPath(currentDir + Path.DirectorySeparatorChar + ".." + Path.DirectorySeparatorChar + ".." + Path.DirectorySeparatorChar + "Resources");
             this.pdfRessources = testRessources + Path.DirectorySeparatorChar + "pdf" + Path.DirectorySeparatorChar;
+            this.outDir = Path.GetFullPath(currentDir + "testout");
+            Directory.CreateDirectory(outDir);
             this.qpdf = new QpdfAdapter();
         }
 
@@ -108,8 +111,8 @@ namespace MandantCrypt.Tests
             // Set source and target folders
             string targetFolder = testRessources;
             var method = System.Reflection.MethodBase.GetCurrentMethod().Name;
-            string targetFileComp = Path.Combine(targetFolder, string.Concat(DateTime.Now.ToString("yyyyMMdd"), "_" + method + "_compressed.pdf"));
-            string targetFileUnComp = Path.Combine(targetFolder, string.Concat(DateTime.Now.ToString("yyyyMMdd"), "_" + method + "_uncompressed.pdf"));
+            string targetFileComp = Path.Combine(outDir, string.Concat(DateTime.Now.ToString("yyyyMMdd"), "_" + method + "_compressed.pdf"));
+            string targetFileUnComp = Path.Combine(outDir, string.Concat(DateTime.Now.ToString("yyyyMMdd"), "_" + method + "_uncompressed.pdf"));
             
             Assert.IsTrue(File.Exists(sourcePdfFile),"Source file doesn't exist");
 
@@ -163,7 +166,7 @@ namespace MandantCrypt.Tests
             string inPdf = "with3FileAttachFoxit.pdf";
             string sourcePdfFile = Path.Combine(this.pdfRessources, inPdf);
             // Set source and target folders
-            string targetFolder = testRessources;
+            string targetFolder = outDir;
             var method = System.Reflection.MethodBase.GetCurrentMethod().Name;
             string targetFileQdf = Path.Combine(targetFolder, string.Concat(DateTime.Now.ToString("yyyyMMdd"), "_" + method + "_qdf.qdf"));
 
@@ -203,7 +206,7 @@ namespace MandantCrypt.Tests
             string inPdf = "usdl4_match_keyword.pdf";
             string sourcePdfFile = Path.Combine(this.pdfRessources, inPdf);
             // Set source and target folders
-            string targetFolder = testRessources;
+            string targetFolder = outDir;
             string srcFolder = testRessources + Path.DirectorySeparatorChar + "tozip" + Path.DirectorySeparatorChar;
             var method = System.Reflection.MethodBase.GetCurrentMethod().Name;
             string targetFile = Path.Combine(targetFolder, string.Concat(DateTime.Now.ToString("yyyyMMdd"), "_" + method + "_encrypted.pdf"));

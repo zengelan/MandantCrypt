@@ -1,13 +1,10 @@
-﻿using RestSharp;
+﻿using log4net;
+using Newtonsoft.Json;
+using RestSharp;
 using RestSharp.Authenticators;
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Net;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
+using System.Reflection;
 
 namespace MandantCrypt
 
@@ -21,10 +18,15 @@ namespace MandantCrypt
         public DateTime last_modified { get; set; }
         public DateTime latest_password_created { get; set; }
         public String note { get; set; }
+        public String preferred_package_type { get; set; }
         public bool active { get; set; }
         public override string ToString()
         {
             return String.Format("{0} {1}", this.number,this.name);
+        }
+        public string ToJsonString()
+        {
+            return JsonConvert.SerializeObject(this);
         }
     }
 
@@ -36,11 +38,15 @@ namespace MandantCrypt
         public String password { get; set; }
         public String password_decrypted { get; set; }
         public String created_by { get; set; }
+        public string ToJsonString()
+        {
+            return JsonConvert.SerializeObject(this);
+        }
     }
 
     public class ApiClient
     {
-
+        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private const String ApiPath = "/api/v1/";
         private const String JsonContentType = "application/json; charset=utf-8";
         public String serviceUrl { get; }
@@ -74,6 +80,13 @@ namespace MandantCrypt
             request.AddQueryParameter("mandant_id", String.Format("{0}",mandantId));
             request.RootElement = "Password";
             Password pass = this.Execute<Password>(request);
+            if (pass == null || String.IsNullOrEmpty(pass.password_decrypted) )
+            {
+                log.Error($"Could not retrieve decrypted password for mandant '{mandantId}'");
+                return null;
+            };
+
+            log.Info($"Returning decrypted password for mandant '{mandantId}'");
             return pass.password_decrypted;
         }
 
