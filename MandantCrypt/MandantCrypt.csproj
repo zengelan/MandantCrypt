@@ -185,7 +185,8 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>
-    </PostBuildEvent>
+    <PostBuildEvent>mkdir $(TargetDir)lib
+mkdir $(TargetDir)lib\qpdf
+copy $(SolutionDir)lib\qpdf\qpdf21.dll $(TargetDir)lib\qpdf\qpdf21.dll</PostBuildEvent>
   </PropertyGroup>
 </Project>

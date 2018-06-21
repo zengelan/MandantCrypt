@@ -23,7 +23,7 @@ namespace MandantCrypt.Tests
         public void Initialize()
         {
             this.currentDir = Directory.GetCurrentDirectory();
-            this.testRessources = Path.GetFullPath(currentDir + Path.DirectorySeparatorChar + ".." + Path.DirectorySeparatorChar + ".." + Path.DirectorySeparatorChar + "Resources");
+            this.testRessources = Path.GetFullPath(currentDir + Path.DirectorySeparatorChar + ".." + Path.DirectorySeparatorChar + ".." + Path.DirectorySeparatorChar + "Testresources");
             this.pdfRessources = testRessources + Path.DirectorySeparatorChar + "pdf" + Path.DirectorySeparatorChar;
             this.outDir = Path.GetFullPath(currentDir + "testout");
             Directory.CreateDirectory(outDir);

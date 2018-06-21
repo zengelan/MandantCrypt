@@ -1,6 +1,7 @@
 ﻿using iText.Kernel.Pdf;
 using iText.Kernel.Pdf.Filespec;
 using log4net;
+using Microsoft.Win32;
 using Newtonsoft.Json;
 using SevenZip;
 using System;
@@ -27,12 +28,12 @@ namespace MandantCrypt
         public enum PackerType
         {
             ZIP = 0,
-            SEVEN_ZIP,         
+            SEVEN_ZIP,
             QPDF,
             ITEXT7
         };
 
-        private static Dictionary<PackerType, String> Extensions = new Dictionary<PackerType, String>
+        public static Dictionary<PackerType, String> Extensions = new Dictionary<PackerType, String>
         {
             { PackerType.ZIP, "zip" },
             { PackerType.SEVEN_ZIP, "7z" },
@@ -151,6 +152,7 @@ namespace MandantCrypt
             log.Info($"Using SevenZip library to create a package with format [{format}]");
             if (this.overwrite) deleteIfExist(this.dstFileName);
 
+            SevenZipBase.SetLibraryPath(get7ZipDllPath());
             SevenZipCompressor zcomp = new SevenZipCompressor();
             zcomp.ArchiveFormat = format;
 
@@ -176,6 +178,14 @@ namespace MandantCrypt
             }
             log.Info($"Successfully packed the files into [{this.dstFileName}]");
             return success;
+        }
+
+        public static string get7ZipDllPath()
+        {
+            string sZipRegistry = Path.Combine("HKEY_LOCAL_MACHINE", "SOFTWARE", "7-Zip");
+            string dllPath = (string)Registry.GetValue(sZipRegistry, "Path", null);
+            if (String.IsNullOrEmpty(dllPath)) return null;
+            return Path.Combine(dllPath, "7z.dll");
         }
 
         private bool createZip(string password)

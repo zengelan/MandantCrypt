@@ -61,6 +61,15 @@ namespace MandantCrypt {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Could not load 7-Zip library. Please install &apos;7-Zip 32-bit x86&apos; from https://www.7-zip.org.
+        /// </summary>
+        internal static string Error_7ZipNotInstalled {
+            get {
+                return ResourceManager.GetString("Error_7ZipNotInstalled", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Could not read settings from registry.
         /// </summary>
         internal static string Error_CouldNotReadSettings {
@@ -120,6 +129,24 @@ namespace MandantCrypt {
         internal static string FileList_Header {
             get {
                 return ResourceManager.GetString("FileList_Header", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Finished packing the files to target file {0}.
+        /// </summary>
+        internal static string InfoBox_FinishedPacking {
+            get {
+                return ResourceManager.GetString("InfoBox_FinishedPacking", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Success.
+        /// </summary>
+        internal static string InfoBox_FinishedPacking_Title {
+            get {
+                return ResourceManager.GetString("InfoBox_FinishedPacking_Title", resourceCulture);
             }
         }
         
